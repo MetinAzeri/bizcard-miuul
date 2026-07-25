@@ -221,9 +221,21 @@
 
     const CARD_URL = "https://metinazeri.github.io/bizcard-miuul/kartvizit-react.html";
 
-    createRoot(document.getElementById("qr-code")).render(
-      React.createElement(QRCodeSVG, { value: CARD_URL, size: 140 })
-    );
+    function mountQrCode() {
+      const container = document.getElementById("qr-code");
+      if (!container) {
+        // The #qr-code div is rendered by the Babel-transformed React tree,
+        // which mounts asynchronously (React 18's scheduler does not commit
+        // synchronously on DOMContentLoaded/load). Poll until it exists.
+        requestAnimationFrame(mountQrCode);
+        return;
+      }
+      createRoot(container).render(
+        React.createElement(QRCodeSVG, { value: CARD_URL, size: 140 })
+      );
+    }
+
+    mountQrCode();
   </script>
 
 </body>
