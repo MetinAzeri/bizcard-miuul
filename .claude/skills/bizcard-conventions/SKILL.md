@@ -65,11 +65,15 @@ module.exports = {
 
 ### Kartı Kaydet → `save_card`
 
-Ziyaretçiden form istenmez; sadece hangi kartın kaydedildiği gönderilir.
+Ziyaretçiden ad ve e-posta **zorunlu**; hangi kartın kaydedildiği bilgisiyle birlikte gönderilir.
 
 ```json
 {
   "action": "save_card",
+  "visitor": {
+    "name": "Ayşe Yılmaz",
+    "email": "ayse@example.com"
+  },
   "card": {
     "name": "Metin Azeri",
     "title": "Satış ve İş Geliştirme Direktörü",
@@ -107,6 +111,6 @@ Ziyaretçiden ad ve e-posta **zorunlu**; telefon, tercih edilen tarih ve mesaj *
 |---|---|
 | Bileşen | Fonksiyon bileşeni, tek dosya (aynı `<script>` bloğu) |
 | Demo veri | `src/data/card.js`, `module.exports` ile |
-| Webhook — Kartı Kaydet | `action: "save_card"` + `card` + `timestamp` |
+| Webhook — Kartı Kaydet | `action: "save_card"` + `visitor.{name,email}` (zorunlu) + `card` + `timestamp` |
 | Webhook — Toplantı Talep Et | `action: "meeting_request"` + `visitor.{name,email}` (zorunlu) + `visitor.phone`/`preferredDate`/`message` (opsiyonel) + `timestamp` |
 | İsimlendirme | camelCase |
