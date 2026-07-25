@@ -121,14 +121,14 @@
     justify-content: center;
   }
 
-  .save-card-form {
+  .visitor-form {
     margin-top: 20px;
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
 
-  .save-card-input {
+  .visitor-input {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid var(--border);
@@ -138,12 +138,12 @@
     color: var(--text-primary);
   }
 
-  .save-card-input:focus {
+  .visitor-input:focus {
     outline: none;
     border-color: var(--accent);
   }
 
-  .save-card-button {
+  .visitor-button {
     padding: 10px 12px;
     border: none;
     border-radius: 10px;
@@ -156,21 +156,27 @@
     transition: opacity 0.15s ease;
   }
 
-  .save-card-button:disabled {
+  .visitor-button:disabled {
     opacity: 0.6;
     cursor: default;
   }
 
-  .save-card-message {
+  .visitor-button--secondary {
+    background: #fff;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+
+  .visitor-message {
     margin: 0;
     font-size: 13px;
   }
 
-  .save-card-message--success {
+  .visitor-message--success {
     color: #15803d;
   }
 
-  .save-card-message--error {
+  .visitor-message--error {
     color: #b91c1c;
   }
 </style>
@@ -265,14 +271,14 @@
       }
 
       if (status === "success") {
-        return <p className="save-card-message save-card-message--success">Kart bilgileriniz kaydedildi, teşekkürler!</p>;
+        return <p className="visitor-message visitor-message--success">Kart bilgileriniz kaydedildi, teşekkürler!</p>;
       }
 
       return (
-        <form className="save-card-form" onSubmit={handleSubmit}>
+        <form className="visitor-form" onSubmit={handleSubmit}>
           <input
             type="text"
-            className="save-card-input"
+            className="visitor-input"
             placeholder="Ad Soyad"
             value={name}
             onChange={(event) => setName(event.target.value)}
@@ -280,17 +286,88 @@
           />
           <input
             type="email"
-            className="save-card-input"
+            className="visitor-input"
             placeholder="E-posta"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
           />
-          <button type="submit" className="save-card-button" disabled={status === "submitting"}>
+          <button type="submit" className="visitor-button" disabled={status === "submitting"}>
             {status === "submitting" ? "Gönderiliyor..." : "Kartı Kaydet"}
           </button>
           {status === "error" && (
-            <p className="save-card-message save-card-message--error">Bir hata oluştu, lütfen tekrar deneyin.</p>
+            <p className="visitor-message visitor-message--error">Bir hata oluştu, lütfen tekrar deneyin.</p>
+          )}
+        </form>
+      );
+    }
+
+    function MeetingRequestForm() {
+      const [name, setName] = useState("");
+      const [email, setEmail] = useState("");
+      const [preferredDate, setPreferredDate] = useState("");
+      const [status, setStatus] = useState("idle");
+
+      async function handleSubmit(event) {
+        event.preventDefault();
+        setStatus("submitting");
+        try {
+          const payload = {
+            action: "meeting_request",
+            visitor: { name: name.trim(), email: email.trim() },
+            timestamp: new Date().toISOString(),
+          };
+          if (preferredDate) {
+            payload.preferredDate = new Date(preferredDate).toISOString();
+          }
+          const response = await fetch(WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!response.ok) {
+            throw new Error("Request failed");
+          }
+          setStatus("success");
+        } catch (error) {
+          setStatus("error");
+        }
+      }
+
+      if (status === "success") {
+        return <p className="visitor-message visitor-message--success">Toplantı talebiniz alındı, teşekkürler!</p>;
+      }
+
+      return (
+        <form className="visitor-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            className="visitor-input"
+            placeholder="Ad Soyad"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            required
+          />
+          <input
+            type="email"
+            className="visitor-input"
+            placeholder="E-posta"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            required
+          />
+          <input
+            type="date"
+            className="visitor-input"
+            aria-label="Tercih edilen tarih"
+            value={preferredDate}
+            onChange={(event) => setPreferredDate(event.target.value)}
+          />
+          <button type="submit" className="visitor-button visitor-button--secondary" disabled={status === "submitting"}>
+            {status === "submitting" ? "Gönderiliyor..." : "Toplantı Talep Et"}
+          </button>
+          {status === "error" && (
+            <p className="visitor-message visitor-message--error">Bir hata oluştu, lütfen tekrar deneyin.</p>
           )}
         </form>
       );
@@ -306,6 +383,7 @@
           <ContactList items={contacts} />
           <div id="qr-code" className="qr-code"></div>
           <SaveCardForm card={card} />
+          <MeetingRequestForm />
         </div>
       );
     }
