@@ -114,6 +114,12 @@
       padding: 28px 20px;
     }
   }
+
+  .qr-code {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+  }
 </style>
 </head>
 <body>
@@ -183,6 +189,7 @@
           <p className="title">{title}</p>
           <hr className="divider" />
           <ContactList items={contacts} />
+          <div id="qr-code" className="qr-code"></div>
         </div>
       );
     }
@@ -205,6 +212,18 @@
 
     const root = ReactDOM.createRoot(document.getElementById("root"));
     root.render(<ProfileCard {...profile} />);
+  </script>
+
+  <script type="module">
+    import React from "https://esm.sh/react@18";
+    import { createRoot } from "https://esm.sh/react-dom@18/client";
+    import { QRCodeSVG } from "https://esm.sh/qrcode.react@3";
+
+    const CARD_URL = "https://metinazeri.github.io/bizcard-miuul/kartvizit-react.html";
+
+    createRoot(document.getElementById("qr-code")).render(
+      React.createElement(QRCodeSVG, { value: CARD_URL, size: 140 })
+    );
   </script>
 
 </body>
