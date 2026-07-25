@@ -167,6 +167,15 @@
     border: 1px solid var(--accent);
   }
 
+  .visitor-button-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .visitor-button-row .visitor-button {
+    flex: 1;
+  }
+
   .visitor-message {
     margin: 0;
     font-size: 13px;
@@ -242,84 +251,48 @@
       );
     }
 
-    function SaveCardForm({ card }) {
-      const [name, setName] = useState("");
-      const [email, setEmail] = useState("");
-      const [status, setStatus] = useState("idle");
-
-      async function handleSubmit(event) {
-        event.preventDefault();
-        setStatus("submitting");
-        try {
-          const response = await fetch(WEBHOOK_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              action: "save_card",
-              visitor: { name: name.trim(), email: email.trim() },
-              card,
-              timestamp: new Date().toISOString(),
-            }),
-          });
-          if (!response.ok) {
-            throw new Error("Request failed");
-          }
-          setStatus("success");
-        } catch (error) {
-          setStatus("error");
-        }
-      }
-
-      if (status === "success") {
-        return <p className="visitor-message visitor-message--success">Kart bilgileriniz kaydedildi, teşekkürler!</p>;
-      }
-
-      return (
-        <form className="visitor-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            className="visitor-input"
-            placeholder="Ad Soyad"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-          />
-          <input
-            type="email"
-            className="visitor-input"
-            placeholder="E-posta"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-          <button type="submit" className="visitor-button" disabled={status === "submitting"}>
-            {status === "submitting" ? "Gönderiliyor..." : "Kartı Kaydet"}
-          </button>
-          {status === "error" && (
-            <p className="visitor-message visitor-message--error">Bir hata oluştu, lütfen tekrar deneyin.</p>
-          )}
-        </form>
-      );
+    function getTodayLocalISODate() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
     }
 
-    function MeetingRequestForm() {
+    function VisitorForm({ card }) {
       const [name, setName] = useState("");
       const [email, setEmail] = useState("");
       const [preferredDate, setPreferredDate] = useState("");
-      const [status, setStatus] = useState("idle");
+      const [dateError, setDateError] = useState(false);
+      const [submittingAction, setSubmittingAction] = useState(null);
+      const [feedback, setFeedback] = useState(null);
+
+      const todayStr = getTodayLocalISODate();
 
       async function handleSubmit(event) {
         event.preventDefault();
-        setStatus("submitting");
+        const action = event.nativeEvent.submitter.value;
+
+        if (action === "meeting_request" && (!preferredDate || preferredDate < todayStr)) {
+          setDateError(true);
+          return;
+        }
+        setDateError(false);
+
+        const payload = {
+          action,
+          visitor: { name: name.trim(), email: email.trim() },
+          timestamp: new Date().toISOString(),
+        };
+        if (action === "save_card") {
+          payload.card = card;
+        } else {
+          payload.preferredDate = new Date(preferredDate).toISOString();
+        }
+
+        setSubmittingAction(action);
+        setFeedback(null);
         try {
-          const payload = {
-            action: "meeting_request",
-            visitor: { name: name.trim(), email: email.trim() },
-            timestamp: new Date().toISOString(),
-          };
-          if (preferredDate) {
-            payload.preferredDate = new Date(preferredDate).toISOString();
-          }
           const response = await fetch(WEBHOOK_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -328,14 +301,18 @@
           if (!response.ok) {
             throw new Error("Request failed");
           }
-          setStatus("success");
+          setFeedback({
+            type: "success",
+            text:
+              action === "save_card"
+                ? "Kart bilgileriniz kaydedildi, teşekkürler!"
+                : "Toplantı talebiniz alındı, teşekkürler!",
+          });
         } catch (error) {
-          setStatus("error");
+          setFeedback({ type: "error", text: "Bir hata oluştu, lütfen tekrar deneyin." });
+        } finally {
+          setSubmittingAction(null);
         }
-      }
-
-      if (status === "success") {
-        return <p className="visitor-message visitor-message--success">Toplantı talebiniz alındı, teşekkürler!</p>;
       }
 
       return (
@@ -360,15 +337,39 @@
             type="date"
             className="visitor-input"
             aria-label="Tercih edilen tarih"
+            min={todayStr}
             value={preferredDate}
-            onChange={(event) => setPreferredDate(event.target.value)}
+            onChange={(event) => {
+              setPreferredDate(event.target.value);
+              setDateError(false);
+            }}
           />
-          <button type="submit" className="visitor-button visitor-button--secondary" disabled={status === "submitting"}>
-            {status === "submitting" ? "Gönderiliyor..." : "Toplantı Talep Et"}
-          </button>
-          {status === "error" && (
-            <p className="visitor-message visitor-message--error">Bir hata oluştu, lütfen tekrar deneyin.</p>
+          <div className="visitor-button-row">
+            <button
+              type="submit"
+              name="action"
+              value="save_card"
+              className="visitor-button"
+              disabled={submittingAction !== null}
+            >
+              {submittingAction === "save_card" ? "Gönderiliyor..." : "Kartı Kaydet"}
+            </button>
+            <button
+              type="submit"
+              name="action"
+              value="meeting_request"
+              className="visitor-button visitor-button--secondary"
+              disabled={submittingAction !== null}
+            >
+              {submittingAction === "meeting_request" ? "Gönderiliyor..." : "Toplantı Talep Et"}
+            </button>
+          </div>
+          {dateError && (
+            <p className="visitor-message visitor-message--error">
+              Toplantı talep etmek için geçmiş olmayan bir tarih seçmelisiniz.
+            </p>
           )}
+          {feedback && <p className={`visitor-message visitor-message--${feedback.type}`}>{feedback.text}</p>}
         </form>
       );
     }
@@ -382,8 +383,7 @@
           <hr className="divider" />
           <ContactList items={contacts} />
           <div id="qr-code" className="qr-code"></div>
-          <SaveCardForm card={card} />
-          <MeetingRequestForm />
+          <VisitorForm card={card} />
         </div>
       );
     }
