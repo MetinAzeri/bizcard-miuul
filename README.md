@@ -1,4 +1,4 @@
-# BizCard
+# bizcard-miuul
 
 Metin Azeri'nin dijital kartviziti. Build adımı, npm bağımlılığı ya da sunucu gerektirmeyen, tarayıcıda doğrudan açılabilen tek dosyalık statik sayfalar.
 
