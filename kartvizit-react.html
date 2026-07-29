@@ -123,6 +123,28 @@
     overflow-wrap: anywhere;
   }
 
+  .social-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    color: var(--text-primary);
+    transition: background 0.15s ease;
+  }
+
+  .social-link:hover {
+    background: var(--bg);
+  }
+
   @media (max-width: 420px) {
     .card {
       padding: 28px 20px;
@@ -311,6 +333,25 @@
       );
     }
 
+    function SocialRow({ items }) {
+      return (
+        <div className="social-row">
+          {items.map((item) => (
+            <a
+              key={item.href}
+              className="social-link"
+              href={item.href}
+              target={item.external ? "_blank" : undefined}
+              rel={item.external ? "noopener noreferrer" : undefined}
+              aria-label={item.label}
+            >
+              {item.icon}
+            </a>
+          ))}
+        </div>
+      );
+    }
+
     function getTodayLocalISODate() {
       const now = new Date();
       const year = now.getFullYear();
@@ -453,7 +494,7 @@
       );
     }
 
-    function ProfileCard({ name, title, initials, contacts, card }) {
+    function ProfileCard({ name, title, initials, contacts, socials, card }) {
       return (
         <div className="card">
           <Avatar initials={initials} />
@@ -461,6 +502,7 @@
           <p className="title">{title}</p>
           <hr className="divider" />
           <ContactList items={contacts} />
+          <SocialRow items={socials} />
           <VisitorForm card={card} />
           <SaveToContactsCard card={card} />
           <div id="qr-code" className="qr-code"></div>
@@ -475,6 +517,8 @@
       contacts: [
         { href: "tel:+905353601808", label: "0535 360 1808", icon: <PhoneIcon /> },
         { href: "mailto:azerimetin@gmail.com", label: "azerimetin@gmail.com", icon: <EmailIcon /> },
+      ],
+      socials: [
         {
           href: "https://www.linkedin.com/in/metinazeri/",
           label: "linkedin.com/in/metinazeri",
@@ -501,7 +545,7 @@
       title: profile.title,
       phone: profile.contacts.find((item) => item.href.startsWith("tel:")).href.replace("tel:", ""),
       email: profile.contacts.find((item) => item.href.startsWith("mailto:")).href.replace("mailto:", ""),
-      linkedin: profile.contacts.find((item) => item.href.includes("linkedin.com")).href,
+      linkedin: profile.socials.find((item) => item.href.includes("linkedin.com")).href,
     };
 
     const root = ReactDOM.createRoot(document.getElementById("root"));
