@@ -188,6 +188,33 @@
   .visitor-message--error {
     color: #b91c1c;
   }
+
+  .save-contact-card {
+    margin-top: 20px;
+    padding: 20px 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .save-contact-title {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .save-contact-description {
+    margin: 0 0 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .save-contact-hint {
+    margin: 12px 0 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
 </style>
 </head>
 <body>
@@ -197,6 +224,7 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="vcard.js"></script>
 
   <script type="text/babel">
     const { useState } = React;
@@ -374,6 +402,25 @@
       );
     }
 
+    function SaveToContactsCard({ card }) {
+      return (
+        <div className="save-contact-card">
+          <p className="save-contact-title">Kartviziti Telefonuma Ekle</p>
+          <p className="save-contact-description">
+            Kartvizitimi rehberine ekle. Yukarıdaki bilgilerini de doldurduysan, sana ayrıca ulaşabiliriz.
+          </p>
+          <button
+            type="button"
+            className="visitor-button"
+            onClick={() => window.downloadVCard(card)}
+          >
+            Telefonuma Ekle
+          </button>
+          <p className="save-contact-hint">Ad, e-posta ve telefonunu da yazarsan sana ayrıca ulaşabiliriz.</p>
+        </div>
+      );
+    }
+
     function ProfileCard({ name, title, initials, contacts, card }) {
       return (
         <div className="card">
@@ -383,6 +430,7 @@
           <hr className="divider" />
           <ContactList items={contacts} />
           <VisitorForm card={card} />
+          <SaveToContactsCard card={card} />
           <div id="qr-code" className="qr-code"></div>
         </div>
       );
