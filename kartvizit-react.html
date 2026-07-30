@@ -251,6 +251,107 @@
     font-size: 12px;
     color: var(--text-secondary);
   }
+
+  .consent-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    text-align: left;
+  }
+
+  .consent-checkbox {
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .consent-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .consent-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--accent);
+    font-size: 12px;
+    font-family: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 10;
+  }
+
+  .modal-panel {
+    width: 100%;
+    max-width: 460px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-align: left;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .modal-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .modal-close {
+    flex-shrink: 0;
+    border: none;
+    background: var(--bg);
+    color: var(--text-secondary);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .modal-section-title {
+    margin: 16px 0 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .modal-text {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  .modal-list {
+    margin: 4px 0 0;
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
 </style>
 </head>
 <body>
@@ -360,6 +461,92 @@
       return `${year}-${month}-${day}`;
     }
 
+    function KvkkModal({ onClose }) {
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div
+            className="modal-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="kvkk-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h2 id="kvkk-modal-title" className="modal-title">KVKK Aydınlatma Metni</h2>
+              <button type="button" className="modal-close" onClick={onClose} aria-label="Kapat">
+                ×
+              </button>
+            </div>
+
+            <p className="modal-text">
+              Bu aydınlatma metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") m.10 uyarınca,
+              bu dijital kartvizit üzerinden toplanan kişisel verileriniz hakkında sizi bilgilendirmek
+              amacıyla hazırlanmıştır.
+            </p>
+
+            <p className="modal-section-title">Veri Sorumlusu</p>
+            <p className="modal-text">
+              Metin Azeri, işbu dijital kartvizit üzerinden topladığı kişisel veriler bakımından veri
+              sorumlusudur. İletişim: azerimetin@gmail.com
+            </p>
+
+            <p className="modal-section-title">Toplanan Kişisel Veriler</p>
+            <ul className="modal-list">
+              <li>Ad Soyad</li>
+              <li>E-posta adresi</li>
+              <li>Toplantı talebinde bulunulması halinde tercih edilen tarih</li>
+            </ul>
+            <p className="modal-text">
+              "Telefonuma Ekle" butonu bu kapsamın dışındadır: bu buton, kartvizit sahibinin bilgilerini
+              yalnızca tarayıcınızda yerel olarak bir .vcf dosyasına dönüştürür; sizinle ilgili hiçbir veri
+              herhangi bir sunucuya gönderilmez.
+            </p>
+
+            <p className="modal-section-title">İşleme Amaçları</p>
+            <ul className="modal-list">
+              <li>Kartvizit bilgilerini kaydetmek istediğinizin veri sorumlusuna iletilmesi ve sizinle iletişime geçilebilmesi</li>
+              <li>Talep etmeniz halinde toplantı planlaması yapılabilmesi</li>
+            </ul>
+
+            <p className="modal-section-title">Hukuki Sebep</p>
+            <p className="modal-text">
+              Verileriniz, KVKK m.5/1 uyarınca vermiş olduğunuz açık rızaya dayanılarak işlenir.
+            </p>
+
+            <p className="modal-section-title">Aktarım</p>
+            <p className="modal-text">
+              Form aracılığıyla ilettiğiniz veriler, veri sorumlusuna ulaştırılabilmesi amacıyla bir
+              otomasyon/entegrasyon aracı (webhook) üzerinden işlenir. Verileriniz, bu işlem amacı dışında
+              üçüncü kişilerle paylaşılmaz.
+            </p>
+
+            <p className="modal-section-title">Saklama Süresi</p>
+            <p className="modal-text">
+              Verileriniz, toplanma amacının gerektirdiği süre boyunca saklanır; bu sürenin sonunda silinir,
+              yok edilir veya anonim hale getirilir.
+            </p>
+
+            <p className="modal-section-title">KVKK m.11 Kapsamındaki Haklarınız</p>
+            <p className="modal-text">
+              Veri sorumlusuna başvurarak; kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse
+              buna ilişkin bilgi talep etme, işlenme amacını ve amacına uygun kullanılıp kullanılmadığını
+              öğrenme, yurt içinde/yurt dışında aktarıldığı üçüncü kişileri bilme, eksik veya yanlış
+              işlenmişse düzeltilmesini isteme, işlenmesini gerektiren sebeplerin ortadan kalkması halinde
+              silinmesini/yok edilmesini isteme, bu işlemlerin aktarıldığı üçüncü kişilere bildirilmesini
+              isteme, işlenen verilerin münhasıran otomatik sistemlerle analiz edilmesi suretiyle aleyhinize
+              bir sonucun ortaya çıkmasına itiraz etme ve kanuna aykırı işleme sebebiyle zarara uğramanız
+              halinde zararın giderilmesini talep etme haklarına sahipsiniz.
+            </p>
+
+            <p className="modal-section-title">Başvuru</p>
+            <p className="modal-text">
+              Haklarınıza ilişkin taleplerinizi azerimetin@gmail.com adresine e-posta göndererek iletebilirsiniz.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     function VisitorForm({ card }) {
       const [name, setName] = useState("");
       const [email, setEmail] = useState("");
@@ -367,6 +554,8 @@
       const [dateError, setDateError] = useState(false);
       const [submittingAction, setSubmittingAction] = useState(null);
       const [feedback, setFeedback] = useState(null);
+      const [consentChecked, setConsentChecked] = useState(false);
+      const [kvkkModalOpen, setKvkkModalOpen] = useState(false);
 
       const todayStr = getTodayLocalISODate();
 
@@ -445,13 +634,36 @@
               setDateError(false);
             }}
           />
+          <label className="consent-row">
+            <input
+              type="checkbox"
+              className="consent-checkbox"
+              checked={consentChecked}
+              onChange={(event) => setConsentChecked(event.target.checked)}
+              required
+            />
+            <span className="consent-label">
+              <button
+                type="button"
+                className="consent-link"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setKvkkModalOpen(true);
+                }}
+              >
+                KVKK Aydınlatma Metni
+              </button>
+              'ni okudum, kişisel verilerimin belirtilen amaçlarla işlenmesini kabul ediyorum.
+            </span>
+          </label>
           <div className="visitor-button-row">
             <button
               type="submit"
               name="action"
               value="save_card"
               className="visitor-button"
-              disabled={submittingAction !== null}
+              disabled={submittingAction !== null || !consentChecked}
             >
               {submittingAction === "save_card" ? "Gönderiliyor..." : "Kartı Kaydet"}
             </button>
@@ -460,7 +672,7 @@
               name="action"
               value="meeting_request"
               className="visitor-button visitor-button--secondary"
-              disabled={submittingAction !== null}
+              disabled={submittingAction !== null || !consentChecked}
             >
               {submittingAction === "meeting_request" ? "Gönderiliyor..." : "Toplantı Talep Et"}
             </button>
@@ -471,6 +683,7 @@
             </p>
           )}
           {feedback && <p className={`visitor-message visitor-message--${feedback.type}`}>{feedback.text}</p>}
+          {kvkkModalOpen && <KvkkModal onClose={() => setKvkkModalOpen(false)} />}
         </form>
       );
     }
